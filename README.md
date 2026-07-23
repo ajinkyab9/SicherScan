@@ -21,26 +21,27 @@ This is a polyglot microservice architecture designed to execute on premise, air
 
 ## Development Roadmap
 
- [ ] Phase 1: AI Sandbox & Microservice Layer
+  Phase 1: AI Sandbox & Microservice Layer
 
     * Setup isolated FastAPI worker
     * Integrate Ollama API calls with context window validation using `tiktoken`
 
- [ ] Phase 2: Core Gateway & Routing
+  Phase 2: Core Gateway & Routing
 
     * Build Express API gateway
     * Implement service-to-service communication (`Node.js` $\rightarrow$ `FastAPI`)
 
- [ ] Phase 3: Relational Persistence & Security
+  Phase 3: Relational Persistence & Security
 
     * Implement PostgreSQL schema (Users, Projects, Scans)
     * Add `JSONB` query capabilities for vulnerability payloads
     * Secure routes via JSON Web Tokens (JWT)
 
- [ ] Phase 4: Developer Dashboard
+  Phase 4: Developer Dashboard
 
     * Construct React UI with Monaco Editor integration
     * Implement async stream loading indicators for scan results
 
- [ ] Phase 5: Polish & Edge Cases
+  Phase 5: Polish & Edge Cases
+  
     * Add error bounds for context overruns and model timeouts
