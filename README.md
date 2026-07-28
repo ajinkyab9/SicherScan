@@ -7,7 +7,7 @@ This is a polyglot microservice architecture designed to execute on premise, air
 * Frontend: React, Tailwind CSS, Monaco Editor Engine
 * Gateway API: Node.js, Express, PostgreSQL
 * Security Microservice: Python, FastAPI, Uvicorn
-* Local AI Engine: Ollama (`qwen2.5-coder`)
+* Local AI Engine: Ollama (`qwen2.5-coder` you can use any local LLM as per your preference and hardware capacity)
 
 ---
 
