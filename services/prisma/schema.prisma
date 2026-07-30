@@ -13,18 +13,29 @@ datasource db {
 }
 
 model Scan {
-  id                  String        @id @default(uuid())
-  userName            String        @db.VarChar(250)
-  codeSnippet         String        @db.Text
-  vulnerabilities     Json?
-  status              String        @default("PENDING")
-  vulSeverity         String?       
-  modelName           String?       
-  processingTime      Int?
-  errorMessage        String?       @db.Text
-  createDate          DateTime      @default(now())       @db.Date
-  createdAt           DateTime      @default(now())
+  id                  String      @id @default(uuid())
+  userName            String      @db.VarChar(250)
+  codeSnippet         String      @db.Text
+  status              String      @default("PENDING")    
+  createDate          DateTime    @default(now())       @db.Date
+  createdAt           DateTime    @default(now())
+
+  vulnerabilities     Vulnerability[]
 
   @@index([userName])
-  @@index([status])
+}
+
+model Vulnerability {
+  id                  String      @id @default(cuid())
+  scanId              String      
+  scan                Scan        @relation(fields: [scanId], references: [id], onDelete: Cascade)
+  vulType             String      @db.VarChar(150)
+  severity            String      @db.VarChar(20)
+  cvssBaseScore       Float     
+  description         String      @db.Text
+  describedChanges    String      @db.Text
+  fixedCode           String      @db.Text
+
+  @@index([scanId])
+  @@index([severity])
 }
