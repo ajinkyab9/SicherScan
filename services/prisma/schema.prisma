@@ -13,9 +13,18 @@ datasource db {
 }
 
 model Scan {
-  id                  String      @id @default(uuid())
-  codeSnippet         String      @db.Text
+  id                  String        @id @default(uuid())
+  userName            String        @db.VarChar(250)
+  codeSnippet         String        @db.Text
   vulnerabilities     Json?
-  status              String      @default("PENDING")
-  createdAt           DateTime    @default(now())
+  status              String        @default("PENDING")
+  vulSeverity         String?       
+  modelName           String?       
+  processingTime      Int?
+  errorMessage        String?       @db.Text
+  createDate          DateTime      @default(now())       @db.Date
+  createdAt           DateTime      @default(now())
+
+  @@index([userName])
+  @@index([status])
 }
