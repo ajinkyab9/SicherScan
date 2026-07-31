@@ -29,7 +29,7 @@ This is a polyglot microservice architecture designed to execute on premise, air
   Phase 2: Core Gateway & Routing
 
     * Build Express API gateway
-    * Implement service-to-service communication (`Node.js` $\rightarrow$ `FastAPI`)
+    * Implement service-to-service communication (`Node.js``FastAPI`)
 
   Phase 3: Relational Persistence & Security
 
