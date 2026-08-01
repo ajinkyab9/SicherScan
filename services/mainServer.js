@@ -1,19 +1,12 @@
 import dotenv from "dotenv";
 dotenv.config();
 import express from "express";
-import { PrismaClient } from "@prisma/client";
-import { PrismaPg } from "@prisma/adapter-pg";
-
-const adapter = new PrismaPg({
-  connectionString: process.env.DATABASE_URL,
-});
-
-const prisma = new PrismaClient({
-  adapter,
-});
+import scanRouter from "./routes/scanRoute.js";
+import prisma from "./config/db.js"; // Import the shared instance
 
 const app = express();
 app.use(express.json());
+app.use("/api/scans", scanRouter);
 const PORT = process.env.PORT || 5000;
 
 app.get("/health", async (req, res) => {
@@ -21,7 +14,7 @@ app.get("/health", async (req, res) => {
     await prisma.$queryRaw`SELECT 1`;
     res.json({ status: "ok", db: "db connection successful" });
   } catch (err) {
-    console.log(err);
+    console.error(err);
     res.status(500).json({ status: "error", db: "disconnected" });
   }
 });
@@ -39,11 +32,9 @@ async function gracefulShutdown(signal) {
     try {
       await prisma.$disconnect();
       console.log("Database connection closed successfully.");
-
       process.exit(0);
     } catch (err) {
-      console.log("Error during database disconnection:", err);
-
+      console.error("Error during database disconnection:", err);
       process.exit(1);
     }
   });
