@@ -12,6 +12,12 @@ datasource db {
   provider = "postgresql"
 }
 
+model Project {
+  id       String @id @default(uuid())
+  projName String @db.VarChar(500)
+  codeLang String @db.VarChar(50)
+}
+
 model Scan {
   id                  String      @id @default(uuid())
   userName            String      @db.VarChar(250)
