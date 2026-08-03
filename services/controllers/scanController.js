@@ -19,7 +19,10 @@ async function triggerScannerEngine(scanId, codeSnippet) {
 
     const updatePayloadStatus = await prisma.scan.update({
       where: { id: scanId },
-      data: { status: "COMPLETED", codeSnippet: "codeSnippet" },
+      data: {
+        status: "COMPLETED",
+        vulnerability: scannedPayloadResult.vulnerabilitiesFound,
+      },
     });
   } catch (error) {
     const failedPayloadScan = await prisma.scan.update({
