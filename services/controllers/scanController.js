@@ -153,4 +153,4 @@ const getScanResult = async (req, res) => {
   }
 };
 
-export default createScanPayload;
+export default { createScanPayload, getScanResult };
