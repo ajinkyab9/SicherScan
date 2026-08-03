@@ -3,6 +3,7 @@ import prisma from "../config/db.js";
 import dotenv from "dotenv";
 import { defaultAllowedOrigins } from "vite";
 //import { response } from "express";
+import redisClient from "../config/redisClient.js";
 dotenv.config();
 
 async function triggerScannerEngine(scanId, codeSnippet) {
@@ -153,4 +154,4 @@ const getScanResult = async (req, res) => {
   }
 };
 
-export default { createScanPayload, getScanResult };
+export { createScanPayload, getScanResult };
