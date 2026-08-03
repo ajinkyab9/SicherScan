@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client";
 import prisma from "../config/db.js";
 import dotenv from "dotenv";
+import { defaultAllowedOrigins } from "vite";
 //import { response } from "express";
 dotenv.config();
 
@@ -96,6 +97,60 @@ const createScanPayload = async (req, res) => {
         message: "An internal server error occurred.",
       });
     }
+};
+
+const getScanResult = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const uuidValidationRegex =
+      /^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$/;
+    if (!uuidValidationRegex.test(id)) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid scan ID format, discarding further operations.",
+      });
+    }
+
+    const scanRecord = await prisma.scan.findUnique({
+      where: { id: id },
+      select: {
+        id: true,
+        status: true,
+        userName: true,
+        createdAt: true,
+        vulnerabilities: {
+          select: {
+            vulType: true,
+            severity: true,
+            cvssBaseScore: true,
+            description: true,
+            describedChanges: true,
+            fixedCode: true,
+          },
+        },
+      },
+    });
+
+    if (!scanRecord) {
+      return res.status(404).json({
+        success: false,
+        message: "Scan record not found.",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: scanRecord,
+    });
+  } catch (error) {
+    console.error("Error fetching scan result:", error);
+    res.status(500).json({
+      success: false,
+      message:
+        "An internal server error occurred while fetching the scan result.",
+    });
+  }
 };
 
 export default createScanPayload;
