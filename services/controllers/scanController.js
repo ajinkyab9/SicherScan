@@ -17,11 +17,23 @@ async function triggerScannerEngine(scanId, codeSnippet) {
 
     const scannedPayloadResult = await engineResponse.json();
 
-    const updatePayloadStatus = await prisma.scan.update({
+    const vulnerabilitiesArray =
+      scannedPayloadResult.vulnerabilitiesFound.vulnerabilities;
+
+    await prisma.scan.update({
       where: { id: scanId },
       data: {
         status: "COMPLETED",
-        vulnerability: scannedPayloadResult.vulnerabilitiesFound,
+        vulnerabilities: {
+          create: vulnerabilitiesArray.map((vuln) => ({
+            vulType: vuln.type,
+            severity: vuln.severity,
+            cvssBaseScore: parseFloat(vuln.CVSS_base_score),
+            description: vuln.description,
+            describedChanges: vuln.recommended_fix.describe_changes,
+            fixedCode: vuln.recommended_fix.fixed_code,
+          })),
+        },
       },
     });
   } catch (error) {
