@@ -8,8 +8,6 @@ dotenv.config();
 const createScanPayload = async (req, res) => {
 
     try {
-      // extraction and validation of data from req.body
-
       const { userName, codeSnippet } = req.body;
 
       if (!userName?.trim() || !codeSnippet?.trim()) {
@@ -18,6 +16,12 @@ const createScanPayload = async (req, res) => {
           message:
             "Missing required fields: userName and codeSnippet are mandatory.",
         });
+      }
+
+      if (codeSnippet.length > 100_000) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Code snippet too large" });
       }
 
       // prisma db operations
