@@ -1,51 +1,9 @@
 import { Prisma } from "@prisma/client";
 import prisma from "../config/db.js";
 import dotenv from "dotenv";
-import { defaultAllowedOrigins } from "vite";
 //import { response } from "express";
 import redisClient from "../config/redisClient.js";
 dotenv.config();
-
-async function triggerScannerEngine(scanId, codeSnippet) {
-  const pythonEngineUrl = process.env.PYTHON_ENGINE_URL;
-  try {
-    const engineResponse = await fetch(pythonEngineUrl, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ scanId, codeSnippet }),
-    });
-
-    const scannedPayloadResult = await engineResponse.json();
-
-    const vulnerabilitiesArray =
-      scannedPayloadResult.vulnerabilitiesFound.vulnerabilities;
-
-    await prisma.scan.update({
-      where: { id: scanId },
-      data: {
-        status: "COMPLETED",
-        vulnerabilities: {
-          create: vulnerabilitiesArray.map((vuln) => ({
-            vulType: vuln.type,
-            severity: vuln.severity,
-            cvssBaseScore: parseFloat(vuln.CVSS_base_score),
-            description: vuln.description,
-            describedChanges: vuln.recommended_fix.describe_changes,
-            fixedCode: vuln.recommended_fix.fixed_code,
-          })),
-        },
-      },
-    });
-  } catch (error) {
-    const failedPayloadScan = await prisma.scan.update({
-      where: { id: scanId },
-      data: { status: "FAILED" },
-    });
-    console.error("Background engine failed:", error);
-  }
-}
 
 const createScanPayload = async (req, res) => {
 
@@ -54,7 +12,7 @@ const createScanPayload = async (req, res) => {
 
       const { userName, codeSnippet } = req.body;
 
-      if (!userName || !codeSnippet) {
+      if (!userName?.trim() || !codeSnippet?.trim()) {
         return res.status(400).json({
           success: false,
           message:
@@ -65,27 +23,31 @@ const createScanPayload = async (req, res) => {
       // prisma db operations
       const newCodeScan = await prisma.scan.create({
         data: {
-          userName: userName,
-          codeSnippet: codeSnippet,
+          userName,
+          codeSnippet,
         },
       });
 
-      //triggering the background engine
-      triggerScannerEngine(newCodeScan.id, codeSnippet);
+      const redisPayload = {
+        id: newCodeScan.id,
+        userName: newCodeScan.userName,
+        codeSnippet: newCodeScan.codeSnippet,
+      };
 
+      try {
+        await redisClient.lPush("scan_job", JSON.stringify(redisPayload));
+      } catch (err) {
+        await prisma.scan.delete({
+          where: { id: newCodeScan.id },
+        });
+        throw err;
+      }
       //returning success response
-      res.status(202).json({ success: true, data: newCodeScan });
+      return res.status(202).json({ success: true, data: newCodeScan });
     } catch (error) {
       console.error("Error create the scan payload", error);
 
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === "P2025") {
-          return res.status(404).json({
-            success: false,
-            message: "Scan record not found in the database.",
-          });
-        }
-
         return res.status(400).json({
           success: false,
           message: "Database operation failed due to invalid data.",
@@ -93,7 +55,7 @@ const createScanPayload = async (req, res) => {
       }
 
       // fallback to tackle unexpected server crash
-      res.status(500).json({
+      return res.status(500).json({
         success: false,
         message: "An internal server error occurred.",
       });
@@ -140,13 +102,13 @@ const getScanResult = async (req, res) => {
       });
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       data: scanRecord,
     });
   } catch (error) {
     console.error("Error fetching scan result:", error);
-    res.status(500).json({
+    return res.status(500).json({
       success: false,
       message:
         "An internal server error occurred while fetching the scan result.",
