@@ -71,7 +71,7 @@ async def main_controller():
 
 
 async def scanWorkerLoop(redis_client, fetch_db_pool, http_client, api_url, llm_model):
-    logger.info("Worker initialized. Listening for jobs on 'scan_job'...")
+    logger.info("Worker initialized. Listening for jobs on 'scanJobs'...")
     
     while True:
         scan_id = "UNKNOWN"
@@ -82,8 +82,8 @@ async def scanWorkerLoop(redis_client, fetch_db_pool, http_client, api_url, llm_
             # wrapped the   entire workflow to prevent worker death used _ to extract tuple first parameter
             _, raw_job = job
             new_job_data = json.loads(raw_job)
-            code_snippet = new_job_data["code_snippet"]
-            scan_id = new_job_data["scan_id"]
+            code_snippet = new_job_data["codeSnippet"]
+            scan_id = new_job_data["id"]
 
             logger.info("New job received for scanning with Scan IO: %s", scan_id)
 
@@ -171,24 +171,37 @@ async def scanWorkerLoop(redis_client, fetch_db_pool, http_client, api_url, llm_
                     for vuln in vulnerabilities:
                          if not isinstance(vuln, dict):
                              raise ValueError("Invalid vulnerability returned by LLM")
+                         
                          vuln_id = str(uuid.uuid4())
+                         raw_score = vuln.get("CVSS_base_score", 0.0)
+                         try:
+                             cvss_score = float(raw_score)
+                         except (TypeError, ValueError):
+                             cvss_score = 0.0
+                         
+                         #extracting the nested fix data from the LLM JSON
+                         rec_fix = vuln.get("recommended_fix", {})
+                         described_changes = rec_fix.get("describe_changes", "")
+                         fixed_code = rec_fix.get("fixed_code", "")
+
                          await connection.execute('''
                          INSERT INTO "Vulnerability" 
-                         (id, "scanId", type, severity, "cvssBaseScore", description, "recommendedFix")
-                         VALUES ($1, $2, $3, $4, $5, $6, $7)
+                         (id, "scanId", "vulType", "severity", "cvssBaseScore", "description", "describedChanges", "fixedCode")
+                         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
                          ''',
                          vuln_id,
                          scan_id,
                          vuln.get("type", "Unknown"),
                          vuln.get("severity", "Unknown"),
-                         vuln.get("CVSS_base_score", ""),
+                         cvss_score,           
                          vuln.get("description", ""),
-                         json.dumps(vuln.get("recommended_fix", {}))
+                         described_changes,   
+                         fixed_code
                      )
                     await connection.execute('UPDATE "Scan" SET status = $1 WHERE id = $2', 'COMPLETED', scan_id)
                     logger.info("Scan ID: %s completed and successfully saved to the database.", scan_id)
         
-        #catch all err if single job fails
+        #catch all err if single job fail
         except Exception as e:
             logger.exception("CRITICAL FAULT: Job failed entirely. Continuing to next job. Scan ID: %s Error: %s", scan_id, e)
             continue
