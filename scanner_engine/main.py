@@ -76,8 +76,11 @@ async def scanWorkerLoop(redis_client, fetch_db_pool, http_client, api_url, llm_
     while True:
         scan_id = "UNKNOWN"
         try:
+            job = await redis_client.brpop(QUEUE_NAME, timeout = 2)
+            if not job:
+                continue
             # wrapped the   entire workflow to prevent worker death used _ to extract tuple first parameter
-            _, raw_job = await redis_client.brpop(QUEUE_NAME, timeout=0)
+            _, raw_job = job
             new_job_data = json.loads(raw_job)
             code_snippet = new_job_data["code_snippet"]
             scan_id = new_job_data["scan_id"]
