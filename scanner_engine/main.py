@@ -142,7 +142,24 @@ async def scanWorkerLoop(redis_client, fetch_db_pool, http_client):
             await fetch_db_pool.execute('UPDATE "Scan" SET status = $1 WHERE id = $2', 'FAILED', scan_id)
             continue
 
-        
+        async with fetch_db_pool.acquire() as connection:
+            async with connection.transaction():
+                connection.execute('UPDATE "Scan" SET status = $1 WHERE id = $2', 'COMPLETED', scan_id)
+                for vuln in vulnerabilities:
+                    vuln_id = str(uuid.uuid4())
+                await connection.execute('''
+                INSERT INTO "Vulnerability" 
+                (id, "scanId", type, severity, "cvssBaseScore", description, "recommendedFix")
+                VALUES ($1, $2, $3, $4, $5, $6, $7)
+                ''',
+                vuln_id,
+                scan_id,
+                vuln.get("type", "Unknown"),
+                vuln.get("severity", "Unknown"),
+                vuln.get("cvssBaseScore", ""),
+                vuln.get("description", ""),
+                json.dumps(vuln.get("recommendedFix", {}))
+            )
                 
 
 if __name__ == "__main__":
