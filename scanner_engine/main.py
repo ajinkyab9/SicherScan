@@ -11,7 +11,7 @@ import asyncpg
 import uuid
 
 MAX_CODE_SIZE = int(os.getenv("MAX_CODE_SIZE", 100000))
-QUEUE_NAME = "scanJobs"
+QUEUE_NAME = "scan_job"
 SYSTEM_PROMPT = """You are an expert Application Security Engineer. 
                 Analyse the provided code for security vulnerabilities. 
                 You MUST return the output exclusively as a valid JSON object. Do not include markdown formatting or extra text.
@@ -71,7 +71,7 @@ async def main_controller():
 
 
 async def scanWorkerLoop(redis_client, fetch_db_pool, http_client, api_url, llm_model):
-    logger.info("Worker initialized. Listening for jobs on 'scanJobs'...")
+    logger.info("Worker initialized. Listening for jobs on 'scan_job'...")
     
     while True:
         scan_id = "UNKNOWN"
