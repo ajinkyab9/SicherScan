@@ -1,0 +1,5 @@
+@import "tailwindcss";
+
+@theme {
+    --color-sidebar-blue: #152b3c;
+}
