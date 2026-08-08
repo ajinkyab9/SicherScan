@@ -25,16 +25,16 @@ export default function Sidebar() {
             </div>
             <nav className="flex-1 p-4">
                 <ul className="space-y-2">
-                    <li className="p-4 flex gap-2 items-center rounded cursor-pointer hover:bg-slate-300 hover:text-black">
+                    <li className="p-4 flex gap-2 items-center rounded-xl cursor-pointer hover:bg-slate-300 hover:text-black transition-colors duration-300 ease-in-out">
                         <LayoutDashboard size={20}/>
                         <span className="font-medium">Dashboard</span></li>
-                    <li className="p-4 flex gap-2 items-center rounded cursor-pointer hover:bg-slate-300 hover:text-black">
+                    <li className="p-4 flex gap-2 items-center rounded-xl cursor-pointer hover:bg-slate-300 hover:text-black transition-colors duration-300 ease-in-out">
                         <Search size={20}/>
                         <span>Scans</span></li>
-                    <li className="p-4 flex gap-2 items-center rounded cursor-pointer hover:bg-slate-300 hover:text-black">
+                    <li className="p-4 flex gap-2 items-center rounded-xl cursor-pointer hover:bg-slate-300 hover:text-black transition-colors duration-300 ease-in-out">
                         <Bug size={20}/>
                         <span>Reports</span></li>
-                    <li className="p-4 flex gap-2 items-center rounded cursor-pointer hover:bg-slate-300 hover:text-black">
+                    <li className="p-4 flex gap-2 items-center rounded-xl cursor-pointer hover:bg-slate-300 hover:text-black transition-colors duration-300 ease-in-out">
                         <ClipboardClock size={20}/>
                         <span>History</span></li>
                 </ul>
