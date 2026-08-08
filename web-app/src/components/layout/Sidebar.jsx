@@ -1,4 +1,4 @@
-import { LayoutDashboard, Search, Bug, ClipboardClock } from "lucide-react"
+import { LayoutDashboard, Search, Bug, ClipboardClock, ChartSpline } from "lucide-react"
 
 export default function Sidebar() {
     return (
@@ -20,6 +20,10 @@ export default function Sidebar() {
                     <li className="p-4 flex gap-2 items-center rounded-xl cursor-pointer hover:bg-slate-300 hover:text-black transition-colors duration-300 ease-in-out">
                         <ClipboardClock size={20}/>
                         <span>History</span></li>
+                    <li className="p-4 flex gap-2 items-center rounded-xl cursor-pointer hover:bg-slate-300 hover:text-black transition-colors duration-300 ease-in-out">
+                       <ChartSpline size={20}/>
+                        <span>Analytics</span>
+                    </li>
                 </ul>
             </nav>
         </aside>
