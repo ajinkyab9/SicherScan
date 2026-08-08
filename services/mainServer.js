@@ -6,7 +6,7 @@ import prisma from "./config/db.js";
 
 const app = express();
 app.use((req, res, next) => {
-  console.log(`🚪 FRONT DOOR: ${req.method} request to ${req.url}`);
+  console.log(`FRONT DOOR: ${req.method} request to ${req.url}`);
   next(); // Pass it to the next function
 });
 app.use(express.json());
