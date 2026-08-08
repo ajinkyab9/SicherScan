@@ -9,19 +9,14 @@ function App() {
   // const [count, setCount] = useState(0)
 return (
     <DashboardLayout>
-      {/* 
-        Everything here is passed as 'children' to the DashboardLayout.
-        This is where your CodeMirror and Scanner logic will eventually live. 
-      */}
       <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-200">
         <h1 className="text-2xl font-bold mb-4">Vulnerability Scanner Active</h1>
         <p className="text-gray-600 mb-8">
           The layout is working! The sidebar and header are locked in place.
         </p>
         
-        {/* Dummy box to hold space for the future Code Editor */}
         <div className="h-96 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center text-gray-400 bg-gray-50 font-mono">
-          // CodeMirror Editor goes here
+          // CodeMirror Editor
         </div>
       </div>
     </DashboardLayout>
