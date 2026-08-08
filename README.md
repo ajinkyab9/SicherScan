@@ -1,4 +1,4 @@
-# AI assisted Code Vulnerability Scanner (Local LLM)
+# Hybrid AI assisted Static Application Security Testing Platform Saas
 
 This is a polyglot microservice architecture designed to execute on premise, air-gapped security audits of source code using quantized LLMs.
 
