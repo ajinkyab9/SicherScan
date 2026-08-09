@@ -1,28 +1,53 @@
-//import { useState } from 'react'
-//import reactLogo from './assets/react.svg'
-//import viteLogo from './assets/vite.svg'
-//import heroImg from './assets/hero.png'
-import DashboardLayout from './components/layout/DashboardLayout'
-import CodeEditor from './components/features/CodeMirrorIntegration';
-
-import './App.css'
+import { useState } from 'react';
+import MainAppLayout from './components/layout/MainAppLayout';
+import ScanContent from './components/layout/ScanContent';
+import './App.css';
 
 function App() {
-  // const [count, setCount] = useState(0)
-return (
-    <DashboardLayout>
-      <div className="bg-white w-full p-8 rounded-lg shadow-sm border border-gray-200">
-        <h1 className="text-2xl font-bold mb-4">Vulnerability Scanner Active</h1>
-        <p className="text-gray-600 mb-8">
-          The layout is working! The sidebar and header are locked in place.
-        </p>
-        <div className="border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center text-gray-400 bg-gray-50 font-mono">
-              <CodeEditor />
-        </div>
+  const [activeTab, setActiveTab] = useState("dashboard");
 
-      </div>
-    </DashboardLayout>
+  const renderContent = () => {
+    switch (activeTab) {
+      case "dashboard":
+        return (
+          <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-200 h-full">
+            <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
+            <p>Main dashboard page.</p>
+          </div>
+        );
+      case "scan":
+        return <ScanContent />;
+      case "reports":
+        return (
+          <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-200 h-full">
+            <h1 className="text-2xl font-bold mb-6">Reports</h1>
+            <p>Downloadable Vulnerability reports .</p>
+          </div>
+        );
+      case "history":
+        return (
+          <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-200 h-full">
+            <h1 className="text-2xl font-bold mb-6">History</h1>
+            <p>The tab for historical data</p>
+          </div>
+        );
+      case "analytics":
+        return (
+          <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-200 h-full">
+            <h1 className="text-2xl font-bold mb-6">Analytics</h1>
+            <p>Analytics Page</p>
+          </div>
+        );
+      default:
+        return <div>Page not found</div>;
+    }
+  };
+
+  return (
+    <MainAppLayout activeTab={activeTab} setActiveTab={setActiveTab}>
+      {renderContent()}
+    </MainAppLayout>
   );
 }
 
-export default App
+export default App;
