@@ -7,7 +7,7 @@ export default function MainAppLayout({ children, activeTab, setActiveTab }) {
             <Sidebar activeTab={activeTab} setActiveTab={setActiveTab}/>
 
             <div className="flex-1 flex flex-col">
-                <Header />
+                <Header activeTab={activeTab}/>
 
                 <main className="flex-1 overflow-y-auto p-6">
                     {children}
