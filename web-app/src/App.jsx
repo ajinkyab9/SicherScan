@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import MainAppLayout from './components/layout/MainAppLayout';
 import ScanContent from './components/layout/ScanContent';
+import Dashboard from './components/layout/Dashboard';
 import './App.css';
 
 function App() {
@@ -9,12 +10,7 @@ function App() {
   const renderContent = () => {
     switch (activeTab) {
       case "dashboard":
-        return (
-          <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-200 h-full">
-            <h1 className="text-2xl font-bold mb-6">Dashboard</h1>
-            <p>Main dashboard page.</p>
-          </div>
-        );
+        return <Dashboard />
       case "scan":
         return <ScanContent />;
       case "reports":
