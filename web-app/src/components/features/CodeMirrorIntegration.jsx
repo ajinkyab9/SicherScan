@@ -28,7 +28,7 @@ export default function CodeEditor() {
 };
 
 return (
-    <div className="p-20">
+    <div className="p-10">
         <div className="mb-10">
             <label htmlFor="lang-select">Language: </label>
             <select id="lang-select" value={langName} onChange={handleLanguageChange}>
