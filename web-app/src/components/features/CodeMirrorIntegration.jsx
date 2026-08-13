@@ -45,7 +45,7 @@ return (
         </div>
         <CodeMirror 
             value={code}
-            height="h-500"
+            height="30rem"
             //theme={vscode}
             extensions={activeExtensions}
             onChange={(value) => setCode(value)}        
