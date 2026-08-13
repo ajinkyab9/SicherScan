@@ -29,7 +29,7 @@ export default function CodeEditor() {
 
 return (
     <div className="p-10">
-        <div className="mb-10">
+        <div className="m-2">
             <label htmlFor="lang-select">Language: </label>
             <select id="lang-select" value={langName} onChange={handleLanguageChange}>
                 <option value="javascript">JavaScript</option>
@@ -45,7 +45,7 @@ return (
         </div>
         <CodeMirror 
             value={code}
-            height="30rem"
+            height="25rem"
             //theme={vscode}
             extensions={activeExtensions}
             onChange={(value) => setCode(value)}        
