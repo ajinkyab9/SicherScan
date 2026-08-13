@@ -23,9 +23,9 @@ export default function Sidebar({ activeTab, setActiveTab }) {
                     <li onClick={() => setActiveTab('scan')} className={getClasses('scan')}>
                         <Search size={20}/>
                         <span>Scan</span></li>
-                    <li onClick={() => setActiveTab('reports')} className={getClasses('reports')}>
+                    {/* <li onClick={() => setActiveTab('reports')} className={getClasses('reports')}>
                         <Bug size={20}/>
-                        <span>Reports</span></li>
+                        <span>Reports</span></li> */}
                     <li onClick={() => setActiveTab('history')} className={getClasses('history')}>
                         <ClipboardClock size={20}/>
                         <span>History</span></li>
