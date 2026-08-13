@@ -1,4 +1,4 @@
-import { LayoutDashboard, Search, Bug, ClipboardClock, ChartSpline } from "lucide-react"
+import { LayoutDashboard, Search, ClipboardClock, ChartSpline } from "lucide-react"
 
 export default function Sidebar({ activeTab, setActiveTab }) {
 
