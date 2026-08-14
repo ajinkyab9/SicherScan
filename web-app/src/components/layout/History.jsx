@@ -27,6 +27,26 @@ export default function SearchFilters() {
     const [cvss, setCvss] = useState("all");
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
+    const [displayedScans, setDisplayedScans] = useState(scanResults);
+
+    const applyFilters = () => {
+        const filterResults = scanResults.filter((scan) => {
+            const matchSeverity = severity === "all" || scan.severity.toLowerCase() === severity.toLowerCase();
+            const matchVulnType = vulnType === "all" || scan.type.toLowerCase() === vulnType.toLowerCase();
+
+            let matchCvss = false;
+            if (cvss === "all") matchCvss = true;
+            else if (cvss === "9+" && scan.cvss >= 9.0) matchCvss = true;
+            else if (cvss === "7-8.9" && scan.cvss >= 7.0 && scan.cvss <= 8.9) matchCvss = true;
+            else if (cvss === "0-6.9" && scan.cvss < 7.0) matchCvss = true;
+
+            const matchStartDate = startDate === "" || scan.date >= startDate;
+            const matchEndDate = endDate === "" || scan.date <= endDate;
+
+            return matchSeverity && matchVulnType && matchCvss && matchStartDate && matchEndDate;
+        });
+        setDisplayedScans(filterResults);
+    }
 
     return (
         <>
@@ -68,7 +88,7 @@ export default function SearchFilters() {
             </select>
 
             <button
-            onClick={() => console.log("Applying filters:", { severity, vulnType, cvss, startDate, endDate })}
+                    onClick={applyFilters}
             className="ml-auto bg-slate-800 text-amber-50 px-5 py-2 rounded-lg hover:bg-slate-700 transition-colors text-sm font-medium hover:cursor-pointer">
                 Apply Filters
             </button>
@@ -87,7 +107,7 @@ export default function SearchFilters() {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-zinc-100 text-sm text-slate-700">
-                            {scanResults.map((scan) => (
+                            {displayedScans.map((scan) => (
                                 <tr key={scan.id} className="hover:bg-slate-50">
                                     <td className="p-4">{scan.date}</td>
                                     <td className="p-4 font-medium text-slate-900">{scan.type}</td>
