@@ -5,7 +5,7 @@ import { languages } from "@codemirror/language-data";
 
 export default function CodeEditor() {
     const [code, setCode] = useState("// Select a language and past your code to be scanned here,");
-    const [langName, setLangName] = useState("javascript");
+    const [langName, setLangName] = useState("Select");
     const [activeExtensions, setActiveExtensions] = useState([]);
 
     //handling of dd and load the lang dynamically
@@ -32,6 +32,7 @@ return (
         <div className="m-2">
             <label htmlFor="lang-select">Language: </label>
             <select id="lang-select" value={langName} onChange={handleLanguageChange}>
+                <option value="">Select</option>
                 <option value="javascript">JavaScript</option>
                 <option value="python">Python</option>
                 <option value="html">HTML</option>
