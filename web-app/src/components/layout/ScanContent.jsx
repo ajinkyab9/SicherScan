@@ -1,5 +1,5 @@
 import { useState } from "react";
-import AtAGlanceStats from "./AtAGlanceStats";
+import AtAGlanceStats from "../ui/AtAGlanceStats";
 import CodeEditor from "../features/CodeMirrorIntegration";
 import CurrentScanResults from "../features/ScanResults";
 
