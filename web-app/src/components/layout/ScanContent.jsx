@@ -3,9 +3,6 @@ import AtAGlanceStats from "./AtAGlanceStats";
 import CodeEditor from "../features/CodeMirrorIntegration";
 import CurrentScanResults from "../features/ScanResults";
 
-
-
-
 export default function ScanContent() {
 
   const [currentView, setCurrentView] = useState("codeEditor");
