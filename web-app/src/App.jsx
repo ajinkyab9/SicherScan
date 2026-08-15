@@ -3,6 +3,7 @@ import MainAppLayout from './components/layout/MainAppLayout';
 import ScanContent from './components/layout/ScanContent';
 import Dashboard from './components/layout/Dashboard';
 import ScanHistory from './components/layout/History';
+import UserAnalytics from './components/layout/Analytics';
 import './App.css';
 
 function App() {
@@ -24,12 +25,7 @@ function App() {
       case "history":
         return <ScanHistory />
       case "analytics":
-        return (
-          <div className="bg-white p-8 rounded-lg shadow-sm border border-gray-200 h-full">
-            <h1 className="text-2xl font-bold mb-6">Analytics</h1>
-            <p>Analytics Page</p>
-          </div>
-        );
+        return <UserAnalytics />
       default:
         return <div>Page not found</div>;
     }
