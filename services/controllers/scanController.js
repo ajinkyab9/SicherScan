@@ -9,13 +9,13 @@ const createScanPayload = async (req, res) => {
 
     try {
       console.log("1 Routing is working, request received Body:", req.body);
-      const { userName, codeSnippet } = req.body;
+      const { userName, codeSnippet, langName } = req.body;
 
-      if (!userName?.trim() || !codeSnippet?.trim()) {
+      if (!userName?.trim() || !codeSnippet?.trim() || langName?.trim()) {
         return res.status(400).json({
           success: false,
           message:
-            "Missing required fields: userName and codeSnippet are mandatory.",
+            "Missing required fields: userName, codeSnippet and language name are mandatory.",
         });
       }
 
@@ -29,6 +29,7 @@ const createScanPayload = async (req, res) => {
         data: {
           userName,
           codeSnippet,
+          langName,
         },
       });
 
@@ -36,6 +37,7 @@ const createScanPayload = async (req, res) => {
         id: newCodeScan.id,
         userName: newCodeScan.userName,
         codeSnippet: newCodeScan.codeSnippet,
+        langName: newCodeScan.langName,
       };
 
       // NOTE: added error checks, if reddit fails, a rollback option is included
