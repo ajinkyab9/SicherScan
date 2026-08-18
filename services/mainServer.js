@@ -1,14 +1,20 @@
 import dotenv from "dotenv";
 dotenv.config();
 import express from "express";
+import cors from "cors";
 import scanRouter from "./routes/scanRoute.js";
 import prisma from "./config/db.js";
 
 const app = express();
 app.use((req, res, next) => {
-  console.log(`FRONT DOOR: ${req.method} request to ${req.url}`);
-  next(); // Pass it to the next function
+  console.log(`mainServer: ${req.method} request to ${req.url}`);
+  next(); 
 });
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+  }),
+);
 app.use(express.json());
 app.use("/api/scans", scanRouter);
 const PORT = process.env.PORT || 5000;
