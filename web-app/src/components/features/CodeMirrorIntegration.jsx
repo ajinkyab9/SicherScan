@@ -1,12 +1,22 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CodeMirror from "@uiw/react-codemirror";
 //import { vscode } from "@uiw/codemirror-theme-vscode";
 import { languages } from "@codemirror/language-data";
+import { fetchLanguages } from "../../api/languagesApi";
 
 export default function CodeEditor() {
     const [code, setCode] = useState("// Select a language and past your code to be scanned here,");
     const [langName, setLangName] = useState("Select");
     const [activeExtensions, setActiveExtensions] = useState([]);
+    const [loadLang, setLoadLang] = useState([]);
+
+    useEffect(() => {
+        const loadLangData = async () => {
+            const langData = await fetchLanguages();
+            setLoadLang(langData);
+        };
+        loadLangData();
+    }, []);
 
     //handling of dd and load the lang dynamically
     const handleLanguageChange = async (e) => {
@@ -33,15 +43,11 @@ return (
             <label htmlFor="lang-select">Language: </label>
             <select id="lang-select" value={langName} onChange={handleLanguageChange}>
                 <option value="">Select</option>
-                <option value="javascript">JavaScript</option>
-                <option value="python">Python</option>
-                <option value="html">HTML</option>
-                <option value="css">CSS</option>
-                <option value="cpp">C++</option>
-                <option value="java">Java</option>
-                <option value="php">PHP</option>
-                <option value="sql">SQL</option>
-                <option value="ruby">Ruby</option>
+                {loadLang.map((lang) => (
+                    <option key={lang} value={lang}>
+                        {lang}
+                    </option>
+                ))}
             </select>
         </div>
         <CodeMirror 
