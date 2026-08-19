@@ -51,9 +51,9 @@ export default function CodeEditor() {
 
         try {
             console.log("Sending code payload", codePayload);
-            const getScanResult = await submitCodeScanRequest(codePayload);
+            const codeScanResult = await submitCodeScanRequest(codePayload);
 
-            console.log("Scan results:", getScanResult);
+            console.log("Scan results:", codeScanResult);
         } catch (error) {
             console.error("Error connecting with the server.", error);
             alert("Error conneting with the server");
