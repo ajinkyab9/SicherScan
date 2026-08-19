@@ -10,7 +10,10 @@ import redis.asyncio
 import asyncpg
 import uuid
 
+load_dotenv()
+
 MAX_CODE_SIZE = int(os.getenv("MAX_CODE_SIZE", 100000))
+ALLOWED_SEVERITIES = {"Critical", "High", "Medium", "Low", "Informational"}
 QUEUE_NAME = "scan_job"
 SYSTEM_PROMPT = """You are an expert Application Security Engineer. 
                 Analyse the provided code for security vulnerabilities. 
@@ -22,8 +25,8 @@ SYSTEM_PROMPT = """You are an expert Application Security Engineer.
                         {
                             "type": "Name of vulnerability (e.g., SQL Injection)",
                             "severity": "High, Medium, Low",
-                            "CVSS_base_score": "Estimated CVSS score from 1.0 to 10.0",
-                            "description": "Brief explanation and fix",
+                            "CVSS_base_score": "Estimated CVSS score from 0.0 to 10.0",
+                            "description": "Brief explanation and impact",
                             "recommended_fix": {
                                 "describe_changes": "Describe the changes that you made",
                                 "fixed_code": "Just output the code here, nothing else"
@@ -31,6 +34,7 @@ SYSTEM_PROMPT = """You are an expert Application Security Engineer.
                         }
                     ]
                 }"""
+
 
 logging.basicConfig(
     level = logging.INFO,
@@ -40,10 +44,12 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-load_dotenv()
 
 async def main_controller():
     raw_database_url = os.getenv("DATABASE_URL")
+
+    if not raw_database_url:
+        raise ValueError("FATAL: DATABASE_URL missing from environment")
     
     # fix for prisma schema mismatch error
     if "?" in raw_database_url:
@@ -165,24 +171,51 @@ async def scanWorkerLoop(redis_client, fetch_db_pool, http_client, api_url, llm_
                 logger.error("Error 502: LLM schema validation failed for Scan ID: %s", scan_id)
                 await fetch_db_pool.execute('UPDATE "Scan" SET status = $1 WHERE id = $2', 'FAILED', scan_id)
                 continue
+            
 
             async with fetch_db_pool.acquire() as connection:
                 async with connection.transaction():
                     for vuln in vulnerabilities:
                          if not isinstance(vuln, dict):
                              raise ValueError("Invalid vulnerability returned by LLM")
+
+                         vuln_type = vuln.get("type")
+                         severity = vuln.get("severity")
+                         description = vuln.get("description", "")
+
+                         if not isinstance(vuln_type, str) or not vuln_type.strip():
+                             raise ValueError("Invalid vulnerability type returned by LLM")
+
+                         if severity not in ALLOWED_SEVERITIES:
+                             raise ValueError("Error: Invalid severity returned by LLM:", severity)
+
+                         if not isinstance(description, str):
+                             raise ValueError("Invalid vulnerability description returned by LLM")
                          
                          vuln_id = str(uuid.uuid4())
                          raw_score = vuln.get("CVSS_base_score", 0.0)
                          try:
                              cvss_score = float(raw_score)
                          except (TypeError, ValueError):
-                             cvss_score = 0.0
+                             raise ValueError("Invalid CVSS score returned by LLM", raw_score)
+
+                         if not 0.0 <= cvss_score <= 10.0:
+                             raise ValueError("CVSS score out of range", cvss_score)
                          
                          #extracting the nested fix data from the LLM JSON
-                         rec_fix = vuln.get("recommended_fix", {})
+                         rec_fix = vuln.get("recommended_fix")
+
+                         if not isinstance(rec_fix, dict):
+                             raise ValueError("Invalid recommended_fix returned by LLM", rec_fix)
+
                          described_changes = rec_fix.get("describe_changes", "")
                          fixed_code = rec_fix.get("fixed_code", "")
+
+                         if not isinstance(described_changes, str):
+                             raise ValueError("Invalid described_changes returned by LLM", described_changes)
+
+                         if not isinstance(fixed_code, str):
+                             raise ValueError("Invalid fixed_code returned by LLM", fixed_code)
 
                          await connection.execute('''
                          INSERT INTO "Vulnerability" 
@@ -204,6 +237,19 @@ async def scanWorkerLoop(redis_client, fetch_db_pool, http_client, api_url, llm_
         #catch all err if single job fail
         except Exception as e:
             logger.exception("CRITICAL FAULT: Job failed entirely. Continuing to next job. Scan ID: %s Error: %s", scan_id, e)
+
+            if scan_id != "UNKNOWN":
+                try:
+                    await fetch_db_pool.execute(
+                        'UPDATE "Scan" SET status = $1 WHERE id = $2',
+                        'FAILED',
+                        scan_id
+                    )
+                except Exception: 
+                    logger.exception(
+                        "Failed to mark Scan ID %s as FAILED",
+                        scan_id
+                    )
             continue
 
 if __name__ == "__main__":
