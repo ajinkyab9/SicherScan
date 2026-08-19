@@ -9,6 +9,7 @@ const scanResults = [
     { id: 2, date: "2026-08-12", type: "Cross-Site Scripting (XSS)", language: "SQL", severity: "Medium", cvss: 5.4 },
     { id: 3, date: "2026-08-10", type: "Auth Bypass", language: "C++", severity: "High", cvss: 8.1 },
     { id: 4, date: "2026-08-09", type: "Outdated Dependency", language: "JavaScript", severity: "Low", cvss: 3.2 },
+    { id: 5, date: "2026-08-13", type: "Info", language: "JavaScript", severity: "Info", cvss: 3.2 }
 ];
 
 const assignSeverityBadge = (tableRowSeverity) => {
@@ -17,6 +18,7 @@ const assignSeverityBadge = (tableRowSeverity) => {
         case "high": return "bg-orange-100 text-orange-700 border-orange-200";
         case "medium": return "bg-yellow-100 text-yellow-700 border-yellow-200";
         case "low": return "bg-blue-100 text-blue-700 border-blue-200";
+        case "info": return "bg-slate-100 text-slate-700 border-slate-200"
         default: return "bg-slate-100 text-slate-700 border-slate-200";
     }
 }
