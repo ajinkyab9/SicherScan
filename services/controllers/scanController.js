@@ -8,10 +8,10 @@ dotenv.config();
 const createScanPayload = async (req, res) => {
 
     try {
-      console.log("Routing is working, request received Body:", req.body);
+      console.log("1 Routing is working, request received Body:", req.body);
       const { userName, codeSnippet, langName } = req.body;
 
-      if (!userName?.trim() || !codeSnippet?.trim() || langName?.trim()) {
+      if (!userName?.trim() || !codeSnippet?.trim() || !langName?.trim()) {
         return res.status(400).json({
           success: false,
           message:
@@ -29,7 +29,7 @@ const createScanPayload = async (req, res) => {
         data: {
           userName,
           codeSnippet,
-          langName,
+          codeLang: langName,
         },
       });
 
@@ -37,7 +37,7 @@ const createScanPayload = async (req, res) => {
         id: newCodeScan.id,
         userName: newCodeScan.userName,
         codeSnippet: newCodeScan.codeSnippet,
-        langName: newCodeScan.langName,
+        codeLang: newCodeScan.langName,
       };
 
       // NOTE: added error checks, if reddit fails, a rollback option is included
@@ -95,6 +95,7 @@ const getScanResult = async (req, res) => {
         status: true,
         userName: true,
         createdAt: true,
+        codeLang: true,
         vulnerabilities: {
           select: {
             vulType: true,
