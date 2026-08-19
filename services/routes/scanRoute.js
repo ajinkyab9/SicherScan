@@ -9,6 +9,7 @@ const scanRouter = express.Router();
 
 scanRouter.post("/", createScanPayload);
 scanRouter.get("/languages", getLanguages);
+scanRouter.get("/history");
 scanRouter.get("/:id", getScanResult);
 
 export default scanRouter;
