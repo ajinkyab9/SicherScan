@@ -8,7 +8,7 @@ dotenv.config();
 const createScanPayload = async (req, res) => {
 
     try {
-      console.log("1 Routing is working, request received Body:", req.body);
+      console.log("Routing is working, request received Body:", req.body);
       const { userName, codeSnippet, langName } = req.body;
 
       if (!userName?.trim() || !codeSnippet?.trim() || langName?.trim()) {
