@@ -3,6 +3,7 @@ import CodeMirror from "@uiw/react-codemirror";
 import { vscodeDark } from "@uiw/codemirror-theme-vscode";
 import { languages } from "@codemirror/language-data";
 import { fetchLanguages } from "../../api/languagesApi";
+import { submitCodeScanRequest } from "../../api/scanApi";
 
 export default function CodeEditor() {
     const [code, setCode] = useState("// Select a language and past your code to be scanned here,");
@@ -36,6 +37,29 @@ export default function CodeEditor() {
         }
     };
 
+    const handleCodeSubmit = async () => {
+        if (!code || code === "// Select a language and past your code to be scanned here," || langName === "Select") {
+            alert("Please select a language and paste a valid code snippet");
+            return;
+        }
+
+        const codePayload = {
+            "userName": "dev",
+            "codeSnippet": code,
+            "langName": langName
+        };
+
+        try {
+            console.log("Sending code payload", codePayload);
+            const getScanResult = await submitCodeScanRequest(codePayload);
+
+            console.log("Scan results:", getScanResult);
+        } catch (error) {
+            console.error("Error connecting with the server.", error);
+            alert("Error conneting with the server");
+        }
+    }
+
     return (
         <div className="p-10">
             <div className="m-2">
@@ -56,6 +80,10 @@ export default function CodeEditor() {
                 extensions={activeExtensions}
                 onChange={(value) => setCode(value)}
             />
+            <button className="mt-6 max-w-32 bg-transparent items-center justify-center flex border-2 border-slate-800 shadow-lg hover:bg-slate-800 text-slate-800 hover:text-zinc-100 duration-300 cursor-pointer active:scale-[0.98] rounded-xl p-2 hover:cursor-pointer"
+                onClick={handleCodeSubmit}>
+                Scan Code
+            </button>
         </div>
     )
 }
