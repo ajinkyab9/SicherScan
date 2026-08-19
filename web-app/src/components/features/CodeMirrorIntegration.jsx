@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import CodeMirror from "@uiw/react-codemirror";
-//import { vscode } from "@uiw/codemirror-theme-vscode";
+import { vscodeDark } from "@uiw/codemirror-theme-vscode";
 import { languages } from "@codemirror/language-data";
 import { fetchLanguages } from "../../api/languagesApi";
 
@@ -24,39 +24,38 @@ export default function CodeEditor() {
         setLangName(selectedLang);
 
         //get language metadata
-        const getLangMeta = languages.find((l) => 
-        l.name.toLowerCase() === selectedLang.toLowerCase || 
-        l.alias.includes(selectedLang)
-    ); 
+        const getLangMeta = languages.find((l) =>
+            l.name.toLowerCase() === selectedLang
+        );
 
-    if (getLangMeta) {
-        const langSupport  = await getLangMeta.load();
-        setActiveExtensions([langSupport.extension]);
-    } else {
-        setActiveExtensions([]);
-    }
-};
+        if (getLangMeta) {
+            const langSupport = await getLangMeta.load();
+            setActiveExtensions([langSupport]);
+        } else {
+            setActiveExtensions([]);
+        }
+    };
 
-return (
-    <div className="p-10">
-        <div className="m-2">
-            <label htmlFor="lang-select">Language: </label>
-            <select id="lang-select" value={langName} onChange={handleLanguageChange}>
-                <option value="">Select</option>
-                {loadLang.map((lang) => (
-                    <option key={lang} value={lang}>
-                        {lang}
-                    </option>
-                ))}
-            </select>
+    return (
+        <div className="p-10">
+            <div className="m-2">
+                <label htmlFor="lang-select">Language: </label>
+                <select id="lang-select" value={langName} onChange={handleLanguageChange}>
+                    <option value="">Select</option>
+                    {loadLang.map((lang) => (
+                        <option key={lang} value={lang}>
+                            {lang}
+                        </option>
+                    ))}
+                </select>
+            </div>
+            <CodeMirror
+                value={code}
+                height="25rem"
+                theme={vscodeDark}
+                extensions={activeExtensions}
+                onChange={(value) => setCode(value)}
+            />
         </div>
-        <CodeMirror 
-            value={code}
-            height="25rem"
-            //theme={vscode}
-            extensions={activeExtensions}
-            onChange={(value) => setCode(value)}        
-        />
-    </div>
-)
+    )
 }
