@@ -1,16 +1,8 @@
 import { useState } from "react";
+import { fetchScanHistory } from "../../api/scanHistoryApi";
+import { useEffect } from "react";
 
 const cmSelectStyles = "bg-slate-50 border border-slate-200 text-slate-700 rounded-lg px-3 py-2 text-sm outline-none cursor-pointer";
-
-//hardcoded dummy data, to render the ui for now before the backend is connected
-
-const scanResults = [
-    { id: 1, date: "2026-08-14", type: "SQL Injection", language: "Python", severity: "Critical", cvss: 9.8 },
-    { id: 2, date: "2026-08-12", type: "Cross-Site Scripting (XSS)", language: "SQL", severity: "Medium", cvss: 5.4 },
-    { id: 3, date: "2026-08-10", type: "Auth Bypass", language: "C++", severity: "High", cvss: 8.1 },
-    { id: 4, date: "2026-08-09", type: "Outdated Dependency", language: "JavaScript", severity: "Low", cvss: 3.2 },
-    { id: 5, date: "2026-08-13", type: "Info", language: "JavaScript", severity: "Info", cvss: 3.2 }
-];
 
 const assignSeverityBadge = (tableRowSeverity) => {
     switch (tableRowSeverity.toLowerCase()) {
@@ -29,10 +21,36 @@ export default function SearchFilters() {
     const [cvss, setCvss] = useState("all");
     const [startDate, setStartDate] = useState("");
     const [endDate, setEndDate] = useState("");
-    const [displayedScans, setDisplayedScans] = useState(scanResults);
+    const [allScans, setAllScans] = useState([]);
+    const [displayedScans, setDisplayedScans] = useState([]);
+    const [uniqueVulnTypes, setUniqueVulnTypes] = useState([]);
+
+
+    useEffect(() => {
+        const loadScanHistory = async () => {
+            const scanHistoryData = await fetchScanHistory();
+            const flatHistoryData = scanHistoryData.flatMap((scan) => {
+                return scan.vulnerabilities.map((vuln) => {
+                    return {
+                        date: scan.createDate.split("T")[0],
+                        type: vuln.vulType,
+                        language: scan.codeLang,
+                        severity: vuln.severity,
+                        cvss: vuln.cvssBaseScore
+                    };
+                });
+            });
+            const vulTypesArray = [...new Set(flatHistoryData.map(item => item.type))];
+
+            setUniqueVulnTypes(vulTypesArray);
+            setAllScans(flatHistoryData);
+            setDisplayedScans(flatHistoryData);
+        };
+        loadScanHistory();
+    }, []);
 
     const applyFilters = () => {
-        const filterResults = scanResults.filter((scan) => {
+        const filterResults = allScans.filter((scan) => {
             const matchSeverity = severity === "all" || scan.severity.toLowerCase() === severity.toLowerCase();
             const matchVulnType = vulnType === "all" || scan.type.toLowerCase() === vulnType.toLowerCase();
 
@@ -66,19 +84,20 @@ export default function SearchFilters() {
             <label htmlFor="severity">Severity</label>
             <select name="severity" value={severity} onChange={(e) => setSeverity(e.target.value)}
             className={cmSelectStyles}>
-                <option value="all">Severities</option>
+                    <option value="all">All</option>
                 <option value="critical">Critical</option>
                 <option value="high">High</option>
                 <option value="medium">Medium</option>
                 <option value="low">Low</option>
+                    <option value="info">Info</option>
             </select>
             <label htmlFor="vulnerabilities">Vulnerabilities</label>
             <select name="vulnerabilities" value={vulnType} onChange={(e) => setVulnType(e.target.value)}
             className={cmSelectStyles}>
                 <option value="all">All</option>
-                <option value="xss">XSS</option>
-                <option value="sql">SQL Injection</option>
-                <option value="auth">Auth Bypass</option>
+                    {uniqueVulnTypes.map((type, index) => (
+                        <option key={index} value={type}>{type}</option>
+                    ))}
             </select>
             <label htmlFor="cvss">CVSS</label>
             <select name="cvss" value={cvss} onChange={(e) => setCvss(e.target.value)}
@@ -86,7 +105,7 @@ export default function SearchFilters() {
                     <option value="all">All</option>
                     <option value="9+">9.0-10</option>
                     <option value="7-8.9">7-8.9</option>
-                    <option value="0-6.9">&lt; 4 - 6.9</option>
+                    <option value="0-6.9">0 - 6.9</option>
             </select>
 
             <button
@@ -110,7 +129,7 @@ export default function SearchFilters() {
                         </thead>
                         <tbody className="divide-y divide-zinc-100 text-sm text-slate-700">
                             {displayedScans.map((scan) => (
-                                <tr key={scan.id} className="hover:bg-slate-50">
+                                <tr className="hover:bg-slate-50">
                                     <td className="p-4">{scan.date}</td>
                                     <td className="p-4 font-medium text-slate-900">{scan.type}</td>
                                     <td className="p-4 font-mono text-xs">{scan.language}</td>
