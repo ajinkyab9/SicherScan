@@ -15,7 +15,7 @@ const assignSeverityBadge = (tableRowSeverity) => {
     }
 }
 
-export default function SearchFilters() {
+export default function ScanHistory() {
     const [severity, setSeverity] = useState("all");
     const [vulnType, setVulnType] = useState("all");
     const [cvss, setCvss] = useState("all");
@@ -84,7 +84,7 @@ export default function SearchFilters() {
 
     return (
         <>
-            <div className="bg-white p-4 rounded-xl border border-slate-300 shadow-sm flex flex-wrap gap-4 items-center">
+            <div className="scrollbar-gutter-stable bg-white p-4 rounded-xl border border-slate-300 shadow-sm flex flex-wrap gap-4 items-center">
                 <label htmlFor="dates">Select Dates</label>
                 <div name="dates" className="flex items-center gap-2 bg-slate-50 px-3 py-2 rounded-lg border border-slate-200">
                     <input type="date" value={startDate}
@@ -135,7 +135,7 @@ export default function SearchFilters() {
                 </button>
             </div>
 
-            <div className="mt-6 bg-zinc-200 border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+            <div className="mt-6 bg-zinc-200 border border-slate-200 rounded-xl shadow-sm">
                 <div className="overflow-x-auto">
                     <table className="w-full text-left border-collapse">
                         <thead>
