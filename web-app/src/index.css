@@ -3,4 +3,9 @@
 @theme {
     --color-sidebar-blue: #152b3c;
     --color-element-blue: #aacae3;
+    --max-h-custom30: 30vh;
+}
+
+html {
+    scrollbar-gutter: stable;
 }
