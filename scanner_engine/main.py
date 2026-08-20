@@ -24,7 +24,7 @@ SYSTEM_PROMPT = """You are an expert Application Security Engineer.
                     "vulnerabilities": [
                         {
                             "type": "Name of vulnerability (e.g., SQL Injection)",
-                            "severity": "High, Medium, Low",
+                            "severity": "Critical, High, Medium, Low, Info",
                             "CVSS_base_score": "Estimated CVSS score from 0.0 to 10.0",
                             "description": "Brief explanation and impact",
                             "recommended_fix": {
