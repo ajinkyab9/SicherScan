@@ -135,10 +135,10 @@ export default function ScanHistory() {
                 </button>
             </div>
 
-            <div className="mt-6 bg-zinc-200 border border-slate-200 rounded-xl shadow-sm">
-                <div className="overflow-x-auto">
+            <div className="mt-6 bg-zinc-200 border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                <div className="overflow-x-auto overflow-y-auto max-h-125 scrollbar-gutter-stable">
                     <table className="w-full text-left border-collapse">
-                        <thead>
+                        <thead className="sticky top-0 bg-slate-100 z-10 shadow-sm">
                             <tr className="bg-zinc-50 border-b border-slate-200 text-xs uppercase tracking-wider text-slate-500 font-medium">
                                 <th className="p-4">Scan Date</th>
                                 <th className="p-4">Vulnerability</th>
