@@ -15,7 +15,7 @@ app.use(
     origin: "http://localhost:5173",
   }),
 );
-app.use(express.json());
+app.use(express.json({ limit: "110kb" }));
 app.use("/api/scans", scanRouter);
 const PORT = process.env.PORT || 5000;
 
