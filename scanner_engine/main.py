@@ -15,32 +15,30 @@ load_dotenv()
 MAX_CODE_SIZE = int(os.getenv("MAX_CODE_SIZE", 100000))
 ALLOWED_SEVERITIES = {"Critical", "High", "Medium", "Low", "Informational"}
 QUEUE_NAME = "scan_job"
-SYSTEM_PROMPT = """You are an expert Application Security Engineer. 
-                Analyse the provided code for security vulnerabilities. 
-                
-                CRITICAL RULES:
-                1. If the code is completely secure and contains no exploitable vulnerabilities, you MUST set "total_vulnerabilities" to 0 and return an empty array [] for "vulnerabilities".
-                2. Do NOT report "missing input validation" if the function does not accept untrusted user input.
-                3. Do NOT report general theoretical best practices as vulnerabilities. Only report actual flaws.
+SYSTEM_PROMPT = """You are an expert Application Security Engineer analyzing a SINGLE code snippet.
 
-                You MUST return the output exclusively as a valid JSON object. Do not include markdown formatting or extra text.
-                Use this exact structure:
-                {
-                    "total_vulnerabilities": <integer representing the total count>,
-                    "vulnerabilities": [
-                        {
-                            "type": "Name of vulnerability (e.g., SQL Injection)",
-                            "severity": "Critical, High, Medium, Low, Info",
-                            "CVSS_base_score": "Estimated CVSS score from 0.0 to 10.0",
-                            "description": "Brief explanation and impact",
-                            "recommended_fix": {
-                                "describe_changes": "Describe the changes that you made",
-                                "fixed_code": "Just output the code here, nothing else"
-                            }
-                        }
-                    ]
-                }"""
+ YOUR EVALUATION PROCESS:
+ 1. Is there an exploitable flaw explicitly written IN THIS CODE (e.g., raw SQL injection, direct eval() of user input)?
+ 2. If the code is missing authentication, rate limiting, or HTTPS, you MUST ASSUME these are handled by external middleware. Do NOT report them.
+ 3. If no explicit flaw exists in the provided text, you MUST return a total count of 0.
 
+ Based on this process, output a valid JSON object matching this exact schema. Do not include markdown or extra text.
+
+ {
+     "total_vulnerabilities": <integer>,
+     "vulnerabilities": [
+         {
+             "type": "Name of vulnerability",
+             "severity": "Critical, High, Medium, Low, Info",
+             "CVSS_base_score": "0.0 to 10.0",
+             "description": "Brief explanation",
+             "recommended_fix": {
+                 "describe_changes": "Describe the changes",
+                 "fixed_code": "Output the code here"
+             }
+         }
+     ]
+ }""" 
 
 logging.basicConfig(
     level = logging.INFO,
