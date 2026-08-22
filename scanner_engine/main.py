@@ -17,6 +17,12 @@ ALLOWED_SEVERITIES = {"Critical", "High", "Medium", "Low", "Informational"}
 QUEUE_NAME = "scan_job"
 SYSTEM_PROMPT = """You are an expert Application Security Engineer. 
                 Analyse the provided code for security vulnerabilities. 
+                
+                CRITICAL RULES:
+                1. If the code is completely secure and contains no exploitable vulnerabilities, you MUST set "total_vulnerabilities" to 0 and return an empty array [] for "vulnerabilities".
+                2. Do NOT report "missing input validation" if the function does not accept untrusted user input.
+                3. Do NOT report general theoretical best practices as vulnerabilities. Only report actual flaws.
+
                 You MUST return the output exclusively as a valid JSON object. Do not include markdown formatting or extra text.
                 Use this exact structure:
                 {
